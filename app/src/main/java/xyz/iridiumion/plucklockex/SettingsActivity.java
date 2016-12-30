@@ -12,10 +12,13 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 public class SettingsActivity extends AppCompatActivity {
@@ -25,6 +28,7 @@ public class SettingsActivity extends AppCompatActivity {
     private CheckBox enabledCheck;
     private CheckBox deviceAdminCheck;
     private EditText thresholdEdit;
+    private Spinner lockMethodSpinner;
 
     public static float MIN_THRESHOLD = 1.5f;
     public static float DEFAULT_THRESHOLD = 10f;
@@ -41,6 +45,7 @@ public class SettingsActivity extends AppCompatActivity {
         enabledCheck = (CheckBox) findViewById(R.id.enabled);
         deviceAdminCheck = (CheckBox) findViewById(R.id.enable_device_admin);
         thresholdEdit = (EditText) findViewById(R.id.threshold_edit);
+        lockMethodSpinner = (Spinner) findViewById(R.id.lock_method);
 
         enabledCheck.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
@@ -64,7 +69,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         float currentThreshold = prefs.getFloat(PreferenceString.THRESHOLD, DEFAULT_THRESHOLD);
         if (currentThreshold < MIN_THRESHOLD) {
-            currentThreshold = (float) MIN_THRESHOLD;
+            currentThreshold = MIN_THRESHOLD;
             prefs.edit().putFloat(PreferenceString.THRESHOLD, currentThreshold).apply();
         }
         thresholdEdit.setText("" + currentThreshold);
@@ -124,6 +129,24 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         deviceAdminCheck.setChecked(dpm.isAdminActive(adminComponent));
+
+        lockMethodSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String choice = adapterView.getItemAtPosition(i).toString();
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putInt(PreferenceString.LOCK_METHOD, i).apply();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putInt(PreferenceString.LOCK_METHOD, AccelerometerService.LOCK_METHOD_DEVICE_ADMIN).apply();
+            }
+        });
+
+        lockMethodSpinner.setSelection(0);
+
     }
 
 
@@ -143,6 +166,7 @@ public class SettingsActivity extends AppCompatActivity {
         } catch (NameNotFoundException e) {
         }    // if this ever happens I will eat many hats.
     }
+
     private void requestDeviceAdmin(ComponentName adminComponent) {
         Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
         intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminComponent);

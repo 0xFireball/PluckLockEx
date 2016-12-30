@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="40dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="40dp">
 
     <CheckBox
         android:id="@+id/enabled"
@@ -55,5 +55,12 @@
         android:layout_height="wrap_content"
         android:text="@string/prefs_enable_device_admin_description"
         android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <Spinner
+        android:id="@+id/lock_method"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:entries="@array/lock_methods"
+        android:prompt="@string/prefs_pick_lock_method" />
 
 </LinearLayout>

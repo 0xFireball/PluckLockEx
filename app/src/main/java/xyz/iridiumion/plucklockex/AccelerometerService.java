@@ -17,6 +17,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class AccelerometerService extends Service {
+    public static int LOCK_METHOD_DEVICE_ADMIN = 0;
+    public static int LOCK_METHOD_ROOT = 1;
+
     public static boolean dead = false;
 
     private SensorManager sensorManager;
