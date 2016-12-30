@@ -19,6 +19,8 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
+import javax.net.ssl.TrustManager;
+
 public class AccelerometerService extends Service {
     public static final int LOCK_METHOD_DEVICE_ADMIN = 0;
     public static final int LOCK_METHOD_ROOT = 1;
@@ -100,7 +102,11 @@ public class AccelerometerService extends Service {
                 return true;
             case LOCK_METHOD_ROOT:
                 try {
-                    Runtime.getRuntime().exec(new String[]{"su", "-c", "input keyevent 26"}).waitFor();
+                    KeyguardManager km = (KeyguardManager) baseContext.getSystemService(Context.KEYGUARD_SERVICE);
+                    boolean locked = km.inKeyguardRestrictedInputMode();
+                    if (!locked) { // don't lock if already screen off
+                        Runtime.getRuntime().exec(new String[]{"su", "-c", "input keyevent 26"}).waitFor();
+                    }
                     return true;
                 } catch (IOException | InterruptedException e) {
                     Toast.makeText(context, "PluckLockEx Root access denied", Toast.LENGTH_SHORT).show();
