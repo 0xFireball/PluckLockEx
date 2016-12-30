@@ -57,13 +57,13 @@ public class AccelerometerService extends Service {
                     threshold = prefs.getFloat("threshold_pref_key", 1);
                     if (threshold < SettingsActivity.MIN_THRESHOLD) {	// only possible pre-update.
                         threshold = SettingsActivity.DEFAULT_THRESHOLD;
-                        prefs.edit().putFloat("threshold_pref_key", threshold).commit();
+                        prefs.edit().putFloat("threshold_pref_key", threshold).apply();
                     }
                 } catch (ClassCastException e) {
                     // The user has a non-float in the settings! Probably because they're migrating from an old version of the app.
                     String thresholdStr = prefs.getString("threshold_pref_key", "1");
                     threshold = Float.valueOf(thresholdStr);
-                    prefs.edit().putFloat("threshold_pref_key", threshold).commit();
+                    prefs.edit().putFloat("threshold_pref_key", threshold).apply();
                 }
                 double x = Math.abs(event.values[0]);
                 double y = Math.abs(event.values[1]);
