@@ -56,7 +56,7 @@ public class SettingsActivity extends AppCompatActivity {
                 }
 
                 SharedPreferences.Editor editor = prefs.edit();
-                editor.putBoolean(PreferenceString.ENABLED, checked).commit();
+                editor.putBoolean(PreferenceString.ENABLED, checked).apply();
             }
         });
 
@@ -65,7 +65,7 @@ public class SettingsActivity extends AppCompatActivity {
         float currentThreshold = prefs.getFloat(PreferenceString.THRESHOLD, DEFAULT_THRESHOLD);
         if (currentThreshold < MIN_THRESHOLD) {
             currentThreshold = (float) MIN_THRESHOLD;
-            prefs.edit().putFloat(PreferenceString.THRESHOLD, currentThreshold);
+            prefs.edit().putFloat(PreferenceString.THRESHOLD, currentThreshold).apply();
         }
         thresholdEdit.setText("" + currentThreshold);
         thresholdEdit.addTextChangedListener(new TextWatcher() {
@@ -90,7 +90,7 @@ public class SettingsActivity extends AppCompatActivity {
                         SharedPreferences.Editor editor = prefs.edit();
                         thresholdEdit.setBackgroundColor(ContextCompat.getColor(SettingsActivity.this, R.color.white));
                         editor.putFloat(PreferenceString.THRESHOLD, newVal);
-                        editor.commit();
+                        editor.apply();
                     }
                 } catch (NumberFormatException e) {
                     thresholdEdit.setBackgroundColor(ContextCompat.getColor(SettingsActivity.this, R.color.red));
@@ -115,7 +115,7 @@ public class SettingsActivity extends AppCompatActivity {
                     enabledCheck.setEnabled(true);
                 } else {
                     SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean(PreferenceString.DISABLED_DEVICE_ADMIN, true).commit();
+                    editor.putBoolean(PreferenceString.DISABLED_DEVICE_ADMIN, true).apply();
                     dpm.removeActiveAdmin(adminComponent);
                     enabledCheck.setChecked(false);
                     enabledCheck.setEnabled(false);
@@ -134,25 +134,15 @@ public class SettingsActivity extends AppCompatActivity {
         if (prefsVersion < 6) {
             // In version 6, we stopped measuring in terms of g and started using straight metres/second^2.
             // Let's bump up the threshold by a factor of 10. This isn't exactly g, but it will provide more friendly values.
-            prefs.edit().putFloat(PreferenceString.THRESHOLD, prefs.getFloat(PreferenceString.THRESHOLD, DEFAULT_THRESHOLD) * 10).commit();
+            prefs.edit().putFloat(PreferenceString.THRESHOLD, prefs.getFloat(PreferenceString.THRESHOLD, DEFAULT_THRESHOLD) * 10).apply();
         }
 
         try {
             // update the pref version so that we know that everything is good.
-            prefs.edit().putInt(PreferenceString.PREFS_VERSION, getPackageManager().getPackageInfo(getPackageName(), 0).versionCode).commit();
+            prefs.edit().putInt(PreferenceString.PREFS_VERSION, getPackageManager().getPackageInfo(getPackageName(), 0).versionCode).apply();
         } catch (NameNotFoundException e) {
         }    // if this ever happens I will eat many hats.
     }
-
-    private void setThemes() {
-        // API < 10
-        setTheme(android.R.style.Theme);
-        // API > 11
-        setTheme(android.R.style.Theme_Holo);
-        // API > 14
-        setTheme(android.R.style.Theme_DeviceDefault);
-    }
-
     private void requestDeviceAdmin(ComponentName adminComponent) {
         Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
         intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminComponent);
