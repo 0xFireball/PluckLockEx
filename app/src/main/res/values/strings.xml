@@ -13,5 +13,6 @@
     <string-array name="lock_methods">
         <item>Device Administrator</item>
         <item>Root</item>
+        <item>Fake (For testing)</item>
     </string-array>
 </resources>

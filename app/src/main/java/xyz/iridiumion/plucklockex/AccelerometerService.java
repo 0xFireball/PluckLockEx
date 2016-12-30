@@ -22,6 +22,7 @@ import java.io.IOException;
 public class AccelerometerService extends Service {
     public static final int LOCK_METHOD_DEVICE_ADMIN = 0;
     public static final int LOCK_METHOD_ROOT = 1;
+    public static final int LOCK_METHOD_FAKE = 2;
 
     public static boolean dead = false;
 
@@ -104,7 +105,10 @@ public class AccelerometerService extends Service {
                 } catch (IOException | InterruptedException e) {
                     Toast.makeText(context, "PluckLockEx Root access denied", Toast.LENGTH_SHORT).show();
                 }
-                return false;
+
+            case LOCK_METHOD_FAKE:
+                Toast.makeText(context, "PluckLockEx fake lock", Toast.LENGTH_SHORT).show();
+                return true;
         }
         return false;
     }

@@ -32,7 +32,7 @@ public class SettingsActivity extends AppCompatActivity {
     private Spinner lockMethodSpinner;
     private Button lockNowButton;
 
-    public static float MIN_THRESHOLD = 1.5f;
+    public static float MIN_THRESHOLD = 2f;
     public static float DEFAULT_THRESHOLD = 10f;
 
     @Override
@@ -41,8 +41,6 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
         this.prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-
-        processOldPrefs();
 
         enabledCheck = (CheckBox) findViewById(R.id.enabled);
         deviceAdminCheck = (CheckBox) findViewById(R.id.enable_device_admin);
@@ -95,9 +93,8 @@ public class SettingsActivity extends AppCompatActivity {
                         Toast.makeText(getBaseContext(), getResources().getString(R.string.too_low), Toast.LENGTH_SHORT).show();
                     } else {
                         SharedPreferences.Editor editor = prefs.edit();
-                        thresholdEdit.setBackgroundColor(ContextCompat.getColor(SettingsActivity.this, R.color.white));
-                        editor.putFloat(PreferenceString.THRESHOLD, newVal);
-                        editor.apply();
+                        thresholdEdit.setBackgroundColor(ContextCompat.getColor(SettingsActivity.this, android.R.color.background_light));
+                        editor.putFloat(PreferenceString.THRESHOLD, newVal).apply();
                     }
                 } catch (NumberFormatException e) {
                     thresholdEdit.setBackgroundColor(ContextCompat.getColor(SettingsActivity.this, R.color.red));
@@ -132,6 +129,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         deviceAdminCheck.setChecked(dpm.isAdminActive(adminComponent));
 
+        int currentLockMethod = prefs.getInt(PreferenceString.LOCK_METHOD, AccelerometerService.LOCK_METHOD_DEVICE_ADMIN);
         lockMethodSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -147,7 +145,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        lockMethodSpinner.setSelection(0);
+        lockMethodSpinner.setSelection(currentLockMethod);
 
         lockNowButton = (Button)findViewById(R.id.lock_now);
         lockNowButton.setOnClickListener(new View.OnClickListener() {
@@ -156,24 +154,6 @@ public class SettingsActivity extends AppCompatActivity {
                 AccelerometerService.lockDeviceNow(SettingsActivity.this, getBaseContext());
             }
         });
-    }
-
-
-    private void processOldPrefs() {
-        // Get the last version that the app was running. 5 is the last version that didn't keep track, so we set that as our version number.
-        int prefsVersion = prefs.getInt(PreferenceString.PREFS_VERSION, 5);
-
-        if (prefsVersion < 6) {
-            // In version 6, we stopped measuring in terms of g and started using straight metres/second^2.
-            // Let's bump up the threshold by a factor of 10. This isn't exactly g, but it will provide more friendly values.
-            prefs.edit().putFloat(PreferenceString.THRESHOLD, prefs.getFloat(PreferenceString.THRESHOLD, DEFAULT_THRESHOLD) * 10).apply();
-        }
-
-        try {
-            // update the pref version so that we know that everything is good.
-            prefs.edit().putInt(PreferenceString.PREFS_VERSION, getPackageManager().getPackageInfo(getPackageName(), 0).versionCode).apply();
-        } catch (NameNotFoundException e) {
-        }    // if this ever happens I will eat many hats.
     }
 
     private void requestDeviceAdmin(ComponentName adminComponent) {
