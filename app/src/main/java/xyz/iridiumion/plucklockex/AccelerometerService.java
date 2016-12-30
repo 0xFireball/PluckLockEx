@@ -72,7 +72,7 @@ public class AccelerometerService extends Service {
                 double y = Math.abs(event.values[1]);
                 double z = Math.abs(event.values[2]);
                 double sum = x + y + z;
-                Log.i("PluckLock", "" + sum);
+                Log.i("PluckLockEx", "" + sum);
                 if (sum > threshold) {
                     // time to lock
                     int lockMethod = prefs.getInt(PreferenceString.LOCK_METHOD, LOCK_METHOD_DEVICE_ADMIN);
