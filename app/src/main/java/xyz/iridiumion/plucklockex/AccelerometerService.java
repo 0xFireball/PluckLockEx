@@ -15,10 +15,13 @@ import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
+
+import java.io.IOException;
 
 public class AccelerometerService extends Service {
-    public static int LOCK_METHOD_DEVICE_ADMIN = 0;
-    public static int LOCK_METHOD_ROOT = 1;
+    public static final int LOCK_METHOD_DEVICE_ADMIN = 0;
+    public static final int LOCK_METHOD_ROOT = 1;
 
     public static boolean dead = false;
 
@@ -55,7 +58,7 @@ public class AccelerometerService extends Service {
 
                 try {
                     threshold = prefs.getFloat("threshold_pref_key", 1);
-                    if (threshold < SettingsActivity.MIN_THRESHOLD) {	// only possible pre-update.
+                    if (threshold < SettingsActivity.MIN_THRESHOLD) {    // only possible pre-update.
                         threshold = SettingsActivity.DEFAULT_THRESHOLD;
                         prefs.edit().putFloat("threshold_pref_key", threshold).apply();
                     }
@@ -71,11 +74,24 @@ public class AccelerometerService extends Service {
                 double sum = x + y + z;
                 Log.i("PluckLock", "" + sum);
                 if (sum > threshold) {
-                    KeyguardManager keyguardManager = (KeyguardManager) getBaseContext().getSystemService(Context.KEYGUARD_SERVICE);
-                    if (!keyguardManager.inKeyguardRestrictedInputMode()) {
-                        DevicePolicyManager dpm = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
-                        if (dpm.isAdminActive(new ComponentName(getBaseContext(), AdminReceiver.class)))
-                            dpm.lockNow();
+                    // time to lock
+                    int lockMethod = prefs.getInt(PreferenceString.LOCK_METHOD, LOCK_METHOD_DEVICE_ADMIN);
+                    switch (lockMethod) {
+                        case LOCK_METHOD_DEVICE_ADMIN:
+                            KeyguardManager keyguardManager = (KeyguardManager) getBaseContext().getSystemService(Context.KEYGUARD_SERVICE);
+                            if (!keyguardManager.inKeyguardRestrictedInputMode()) {
+                                DevicePolicyManager dpm = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+                                if (dpm.isAdminActive(new ComponentName(getBaseContext(), AdminReceiver.class)))
+                                    dpm.lockNow();
+                            }
+                            break;
+                        case LOCK_METHOD_ROOT:
+                            try {
+                                Runtime.getRuntime().exec(new String[]{"su", "-c", "input keyevent 26"}).waitFor();
+                            } catch (IOException | InterruptedException e) {
+                                Toast.makeText(AccelerometerService.this, "PluckLockEx Root access denied", Toast.LENGTH_SHORT).show();
+                            }
+                            break;
                     }
                 }
             }
