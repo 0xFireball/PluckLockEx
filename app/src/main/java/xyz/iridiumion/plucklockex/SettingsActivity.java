@@ -14,6 +14,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -29,6 +30,7 @@ public class SettingsActivity extends AppCompatActivity {
     private CheckBox deviceAdminCheck;
     private EditText thresholdEdit;
     private Spinner lockMethodSpinner;
+    private Button lockNowButton;
 
     public static float MIN_THRESHOLD = 1.5f;
     public static float DEFAULT_THRESHOLD = 10f;
@@ -147,6 +149,13 @@ public class SettingsActivity extends AppCompatActivity {
 
         lockMethodSpinner.setSelection(0);
 
+        lockNowButton = (Button)findViewById(R.id.lock_now);
+        lockNowButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AccelerometerService.lockDeviceNow(SettingsActivity.this, getBaseContext());
+            }
+        });
     }
 
 

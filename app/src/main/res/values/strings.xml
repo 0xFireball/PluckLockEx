@@ -7,6 +7,8 @@
     <string name="prefs_enable_device_admin_description">Must be checked for app to function. Uncheck this before uninstalling.</string>
     <string name="too_low">That threshold is too low. Trust me.</string>
     <string name="prefs_pick_lock_method">Select the method used to lock the screen. Device Administrator will work on all devices, but will force PIN/password entry.</string>
+    <string name="prefs_test_lock_now_label">Test the current lock method by locking the device now.</string>
+    <string name="prefs_test_lock_now">Test lock method</string>
 
     <string-array name="lock_methods">
         <item>Device Administrator</item>

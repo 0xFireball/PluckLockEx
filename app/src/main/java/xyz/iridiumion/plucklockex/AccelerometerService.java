@@ -75,24 +75,7 @@ public class AccelerometerService extends Service {
                 Log.i("PluckLockEx", "" + sum);
                 if (sum > threshold) {
                     // time to lock
-                    int lockMethod = prefs.getInt(PreferenceString.LOCK_METHOD, LOCK_METHOD_DEVICE_ADMIN);
-                    switch (lockMethod) {
-                        case LOCK_METHOD_DEVICE_ADMIN:
-                            KeyguardManager keyguardManager = (KeyguardManager) getBaseContext().getSystemService(Context.KEYGUARD_SERVICE);
-                            if (!keyguardManager.inKeyguardRestrictedInputMode()) {
-                                DevicePolicyManager dpm = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
-                                if (dpm.isAdminActive(new ComponentName(getBaseContext(), AdminReceiver.class)))
-                                    dpm.lockNow();
-                            }
-                            break;
-                        case LOCK_METHOD_ROOT:
-                            try {
-                                Runtime.getRuntime().exec(new String[]{"su", "-c", "input keyevent 26"}).waitFor();
-                            } catch (IOException | InterruptedException e) {
-                                Toast.makeText(AccelerometerService.this, "PluckLockEx Root access denied", Toast.LENGTH_SHORT).show();
-                            }
-                            break;
-                    }
+                    lockDeviceNow(AccelerometerService.this, getBaseContext());
                 }
             }
         };
@@ -100,6 +83,30 @@ public class AccelerometerService extends Service {
         sensorManager.registerListener(activeListener, sensor, SensorManager.SENSOR_DELAY_UI);
 
         return START_STICKY;
+    }
+
+    public static boolean lockDeviceNow(Context context, Context baseContext) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(baseContext);
+        int lockMethod = prefs.getInt(PreferenceString.LOCK_METHOD, LOCK_METHOD_DEVICE_ADMIN);
+        switch (lockMethod) {
+            case LOCK_METHOD_DEVICE_ADMIN:
+                KeyguardManager keyguardManager = (KeyguardManager) baseContext.getSystemService(Context.KEYGUARD_SERVICE);
+                if (!keyguardManager.inKeyguardRestrictedInputMode()) {
+                    DevicePolicyManager dpm = (DevicePolicyManager) baseContext.getSystemService(Context.DEVICE_POLICY_SERVICE);
+                    if (dpm.isAdminActive(new ComponentName(baseContext, AdminReceiver.class)))
+                        dpm.lockNow();
+                }
+                return true;
+            case LOCK_METHOD_ROOT:
+                try {
+                    Runtime.getRuntime().exec(new String[]{"su", "-c", "input keyevent 26"}).waitFor();
+                    return true;
+                } catch (IOException | InterruptedException e) {
+                    Toast.makeText(context, "PluckLockEx Root access denied", Toast.LENGTH_SHORT).show();
+                }
+                return false;
+        }
+        return false;
     }
 
     public void killSensor() {

@@ -68,4 +68,14 @@
         android:layout_height="wrap_content"
         android:text="@string/prefs_pick_lock_method" />
 
+    <Button
+        android:id="@+id/lock_now"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/prefs_test_lock_now" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/prefs_test_lock_now_label" />
 </LinearLayout>
