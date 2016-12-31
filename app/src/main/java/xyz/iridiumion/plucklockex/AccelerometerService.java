@@ -26,7 +26,7 @@ public class AccelerometerService extends Service {
     public static final int LOCK_METHOD_ROOT = 1;
     public static final int LOCK_METHOD_FAKE = 2;
 
-    private static final int MIN_LOCK_TIME_SPACING = 200;
+    private static final int MIN_LOCK_TIME_SPACING = 50;
 
     public static boolean dead = false;
 
@@ -84,7 +84,8 @@ public class AccelerometerService extends Service {
                 Log.i("PluckLockEx", "" + sum);
                 if (sum > threshold) {
                     // time to lock
-                    if (lastLockCycles - cycles > MIN_LOCK_TIME_SPACING) { // de-bouncing
+                    int timeGap = cycles - lastLockCycles;
+                    if (timeGap > MIN_LOCK_TIME_SPACING) { // de-bouncing
                         lastLockCycles = cycles;
                         lockDeviceNow(AccelerometerService.this, getBaseContext());
                     }
