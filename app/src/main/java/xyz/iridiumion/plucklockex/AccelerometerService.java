@@ -26,10 +26,14 @@ public class AccelerometerService extends Service {
     public static final int LOCK_METHOD_ROOT = 1;
     public static final int LOCK_METHOD_FAKE = 2;
 
+    private static final int MIN_LOCK_TIME_SPACING = 200;
+
     public static boolean dead = false;
 
     private SensorManager sensorManager;
     private Sensor sensor;
+    private int cycles;
+    private int lastLockCycles = Integer.MIN_VALUE;
     private SensorEventListener activeListener;
 
     @Override
@@ -56,6 +60,8 @@ public class AccelerometerService extends Service {
                 if (AccelerometerService.dead)
                     return;
 
+                ++cycles;
+
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                 float threshold;
 
@@ -78,7 +84,10 @@ public class AccelerometerService extends Service {
                 Log.i("PluckLockEx", "" + sum);
                 if (sum > threshold) {
                     // time to lock
-                    lockDeviceNow(AccelerometerService.this, getBaseContext());
+                    if (lastLockCycles - cycles > MIN_LOCK_TIME_SPACING) { // de-bouncing
+                        lastLockCycles = cycles;
+                        lockDeviceNow(AccelerometerService.this, getBaseContext());
+                    }
                 }
             }
         };
