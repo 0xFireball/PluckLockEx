@@ -26,14 +26,14 @@ public class AccelerometerService extends Service {
     public static final int LOCK_METHOD_ROOT = 1;
     public static final int LOCK_METHOD_FAKE = 2;
 
-    private static final int MIN_LOCK_TIME_SPACING = 50;
+    private static final int MIN_LOCK_TIME_SPACING = 10;
 
     public static boolean dead = false;
 
     private SensorManager sensorManager;
     private Sensor sensor;
     private int cycles;
-    private int lastLockCycles = Integer.MIN_VALUE;
+    private int lastLockCycles = cycles - MIN_LOCK_TIME_SPACING;
     private SensorEventListener activeListener;
 
     @Override
