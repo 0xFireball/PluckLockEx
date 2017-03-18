@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/PluckLockEx.iml" filepath="$PROJECT_DIR$/PluckLockEx.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PluckLockEx.iml" filepath="$PROJECT_DIR$/PluckLockEx.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
