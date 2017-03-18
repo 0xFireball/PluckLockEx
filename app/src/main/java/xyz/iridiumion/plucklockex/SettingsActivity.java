@@ -33,7 +33,7 @@ public class SettingsActivity extends AppCompatActivity {
     private Button lockNowButton;
 
     public static float MIN_THRESHOLD = 2f;
-    public static float DEFAULT_THRESHOLD = 10f;
+    public static float DEFAULT_THRESHOLD = 40f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
