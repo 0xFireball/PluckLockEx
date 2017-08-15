@@ -3,12 +3,14 @@ package xyz.iridiumion.plucklockex;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -106,7 +108,25 @@ public class SettingsActivity extends AppCompatActivity {
                 AdminReceiver.class);
 
         if (!prefs.getBoolean(PreferenceString.DISABLED_DEVICE_ADMIN, false)) {    // user has never unchecked it, ever
-            requestDeviceAdmin(adminComponent);
+            // ask nicely if we can enable device admin
+            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            requestDeviceAdmin(adminComponent);
+                            break;
+
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            //No button clicked
+                            break;
+                    }
+                }
+            };
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("PluckLockEx requires Device Administrator to be enabled to lock the device without root. This permission is only used to lock the device when it is snatched, and all the parameters can be changed in settings. Should this permission be enabled now? PLuckLockEx cannot function without it.").setPositiveButton("Yes", dialogClickListener)
+                    .setNegativeButton("No", dialogClickListener).show();
         }
 
         final DevicePolicyManager dpm = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
@@ -147,7 +167,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         lockMethodSpinner.setSelection(currentLockMethod);
 
-        lockNowButton = (Button)findViewById(R.id.lock_now);
+        lockNowButton = (Button) findViewById(R.id.lock_now);
         lockNowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
