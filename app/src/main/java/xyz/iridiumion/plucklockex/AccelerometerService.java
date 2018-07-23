@@ -81,7 +81,6 @@ public class AccelerometerService extends Service {
                 double y = Math.abs(event.values[1]);
                 double z = Math.abs(event.values[2]);
                 double total = Math.sqrt(x * x + y * y + z * z);
-                Log.i("PluckLockEx", "" + total);
                 if (total > threshold) {
                     // time to lock
                     int timeGap = cycles - lastLockCycles;
